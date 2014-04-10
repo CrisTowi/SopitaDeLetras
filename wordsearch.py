@@ -151,6 +151,8 @@ class Sopa():
     width = 0
     height = 0
     word_coords = {}
+    word_bank = []
+
 
     def __init__(self, width, height):
         
@@ -162,51 +164,13 @@ class Sopa():
                      len(w) < height]
         # Filter out uneligible words (i.e. that are too long)
         word_bank = sample(word_bank, 10)
-        print " Banco de palabras ".center(width * 2, "=")
-        i = 0
-        for word in word_bank:
-            print word.center(width * 2)
-        print "=" * width * 2
+
         # Show the word bank
         puzzle, word_coords = word_search(width, height, word_bank)
 
         self.sopa = puzzle
         self.word_coords = word_coords
-
-        self.print_puzzle()
-
-        start_time = time()
-        print start_time
-        # Start the timer
-        words_found = []
-        while len(words_found) < len(word_bank):
-            word = raw_input("Qué palabra encontraste? ").lower()
-            if word not in word_bank:
-                # not in the word bank
-                print 'No está en el banco de palabras ' + word
-                continue
-            coords = raw_input("Ingresa las coordenadas (separadas por comas) de 'x' 'y' de la palabra ")
-            coords = coords.strip().strip("()").strip()
-            # Remove parentheses and whitespace
-            try:
-                x, y = coords.split(",")
-                x, y = int(x.strip()) - 1, int(y.strip()) - 1
-            except ValueError, IndexError:
-                # invalid format
-                print "Las coordenadas deben estár separadas por comas"
-                continue
-            else:
-                if (x, y) == word_coords[word.upper()]:
-                    words_found.append(word)
-                    print '"%s" encontrado!. %s faltantes.' % (
-                        word, len(word_bank) - len(words_found)
-                    )
-                else:
-                    # incorrect coordinates
-                    print 'La palabra ' + 'sí está en el bancon de letras pero no en las coordenadas especificadas'
-        print "Felicidades! Completaste la sopa de letras en %d segundos." % (
-            time() - start_time)
-        # Show the time elapsed
+        self.word_bank = word_bank
 
     def print_puzzle(self):
 
@@ -215,7 +179,3 @@ class Sopa():
             for j in range(self.width):
                 print str(self.sopa[j][i]),
             print
-     
-
-sopa = Sopa(15,15)
-sopa.print_puzzle()

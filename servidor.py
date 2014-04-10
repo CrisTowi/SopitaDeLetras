@@ -3,17 +3,18 @@ import socket
 
 from wordsearch import Sopa
 
-def imprime(num):  
-	print "Soy el hilo", num  
+import pickle
 
 def enviar_info(sc, address):
 	sopa = Sopa(15,15)
+
 	seguir =  True
 	while (seguir):
 		peticion = sc.recv(1000)
 		if ("adios"!=peticion):
 			print str(address)+ " envia hola: contesto"
-			sc.send("pues hola")
+			print(sopa.sopa)
+			sc.send(pickle.dumps([sopa.sopa, sopa.word_coords, sopa.word_bank]))
              
          # Contestacion y cierre a "adios"
 		if ("adios"==peticion):
@@ -25,7 +26,7 @@ def enviar_info(sc, address):
 
 
 s = socket.socket()
-s.bind(("localhost", 8001))
+s.bind(("localhost", 8004))
 s.listen(5)
 
 arreglo_sockets = []
