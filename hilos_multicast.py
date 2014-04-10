@@ -31,7 +31,6 @@ def reciever():
 		print message
 
 
-t1 = threading.Thread(target=sender, name='Sender',args=('Hola amigos',))
 t2 = threading.Thread(target=reciever, name='Sender')
 
 t2.setDaemon(True)
@@ -41,4 +40,4 @@ t2.start()
 while (True):
 	a = raw_input('Enviar mensaje? y/n')
 	if(a == 'y'):
-		t1.run()
+		sender('Mensajote')

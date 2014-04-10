@@ -4,12 +4,13 @@
 from string import ascii_uppercase
 from random import choice
 
+from random import sample
+from time import time
+
 W2E, E2W, N2S, S2N, NW2SE, NE2SW, SW2NE, SE2NW = range(8)
 # Las direcciones a las que podemos ir
 
 def word_search_base(width, height):
-    """Genera un arreglo de caracteres aleatorios"""
-    
     columns = []
     # 2D list
     for i in range(width):
@@ -17,14 +18,6 @@ def word_search_base(width, height):
     return columns
 
 def insert(word, puzzle, x, y, direction=W2E, inplace=True):
-    """Insert a word into a puzzle starting at (x, y) going in the
-    specified direction.
-    
-    Returns a list of newly occupied coordinates and the modified
-    puzzle.
-    
-    """
-    
     coords = []
     if not inplace:
         new_puzzle = [[j for j in i] for i in puzzle]
@@ -109,9 +102,7 @@ def insert(word, puzzle, x, y, direction=W2E, inplace=True):
             j -= 1
     return coords, new_puzzle
 
-def word_search(width, height, words):
-    """Create a word search with the specified words."""
-    
+def word_search(width, height, words):    
     assert width * height > len("".join(words)), \
            "Too many words for a %sx%s puzzle" % (width, height)
     max_length = 0
@@ -155,71 +146,76 @@ def word_search(width, height, words):
                     break
     return base, word_coords
 
-def print_puzzle(puzzle, height, width):
+class Sopa():
+    sopa = []
+    width = 0
+    height = 0
+    word_coords = {}
 
-    for k in range(width):
-        print str(k)+'\t',
-    print k+1,
-    print
-    for i in range(height):
-        print str(i+1),
-        for j in range(width):
-            print str('\t'+puzzle[j][i]),
-        print
+    def __init__(self, width, height):
+        
+        self.width = width
+        self.height = height
 
-if __name__ == "__main__":
-    from random import sample
-    from time import time
-    
-    print "Sopa de Letras! =D"
-    width = 15
-    height = 15
-    print "Cargando palabras del archivo..."
-    word_bank = open("enable1.txt").read().splitlines()
-    word_bank = [w.lower() for w in word_bank if len(w) < width or
-                 len(w) < height]
-    # Filter out uneligible words (i.e. that are too long)
-    word_bank = sample(word_bank, 10)
-    print " Banco de palabras ".center(width * 2, "=")
-    i = 0
-    for word in word_bank:
-        print word.center(width * 2)
-    print "=" * width * 2
-    # Show the word bank
-    puzzle, word_coords = word_search(width, height, word_bank)
+        word_bank = open("enable1.txt").read().splitlines()
+        word_bank = [w.lower() for w in word_bank if len(w) < width or
+                     len(w) < height]
+        # Filter out uneligible words (i.e. that are too long)
+        word_bank = sample(word_bank, 10)
+        print " Banco de palabras ".center(width * 2, "=")
+        i = 0
+        for word in word_bank:
+            print word.center(width * 2)
+        print "=" * width * 2
+        # Show the word bank
+        puzzle, word_coords = word_search(width, height, word_bank)
 
-    print_puzzle(puzzle, height, width)
+        self.sopa = puzzle
+        self.word_coords = word_coords
 
-    start_time = time()
-    print start_time
-    # Start the timer
-    words_found = []
-    while len(words_found) < len(word_bank):
-        word = raw_input("Qué palabra encontraste? ").lower()
-        if word not in word_bank:
-            # not in the word bank
-            print 'No está en el banco de palabras ' + word
-            continue
-        coords = raw_input("Ingresa las coordenadas (separadas por comas) de 'x' 'y' de la palabra ")
-        coords = coords.strip().strip("()").strip()
-        # Remove parentheses and whitespace
-        try:
-            x, y = coords.split(",")
-            x, y = int(x.strip()) - 1, int(y.strip()) - 1
-        except ValueError, IndexError:
-            # invalid format
-            print "Las coordenadas deben estár separadas por comas"
-            continue
-        else:
-            if (x, y) == word_coords[word.upper()]:
-                words_found.append(word)
-                print '"%s" encontrado!. %s faltantes.' % (
-                    word, len(word_bank) - len(words_found)
-                )
+        self.print_puzzle()
+
+        start_time = time()
+        print start_time
+        # Start the timer
+        words_found = []
+        while len(words_found) < len(word_bank):
+            word = raw_input("Qué palabra encontraste? ").lower()
+            if word not in word_bank:
+                # not in the word bank
+                print 'No está en el banco de palabras ' + word
+                continue
+            coords = raw_input("Ingresa las coordenadas (separadas por comas) de 'x' 'y' de la palabra ")
+            coords = coords.strip().strip("()").strip()
+            # Remove parentheses and whitespace
+            try:
+                x, y = coords.split(",")
+                x, y = int(x.strip()) - 1, int(y.strip()) - 1
+            except ValueError, IndexError:
+                # invalid format
+                print "Las coordenadas deben estár separadas por comas"
+                continue
             else:
-                # incorrect coordinates
-                print 'La palabra ' + 'sí está en el bancon de letras pero no en las coordenadas especificadas'
-    print "Felicidades! Completaste la sopa de letras en %d segundos." % (
-        time() - start_time)
-    # Show the time elapsed
- 
+                if (x, y) == word_coords[word.upper()]:
+                    words_found.append(word)
+                    print '"%s" encontrado!. %s faltantes.' % (
+                        word, len(word_bank) - len(words_found)
+                    )
+                else:
+                    # incorrect coordinates
+                    print 'La palabra ' + 'sí está en el bancon de letras pero no en las coordenadas especificadas'
+        print "Felicidades! Completaste la sopa de letras en %d segundos." % (
+            time() - start_time)
+        # Show the time elapsed
+
+    def print_puzzle(self):
+
+        for i in range(self.height):
+            print str(i+1) + '\t',
+            for j in range(self.width):
+                print str(self.sopa[j][i]),
+            print
+     
+
+sopa = Sopa(15,15)
+sopa.print_puzzle()
