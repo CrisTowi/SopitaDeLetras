@@ -53,7 +53,7 @@ def juego(puzzle, word_bank, word_coords):
 
 
 s = socket.socket()
-s.connect(("localhost", 8004))
+s.connect(("localhost", 8001))
 
 buffzise = 10000
 
