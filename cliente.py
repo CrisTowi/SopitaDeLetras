@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import threading  
 import socket
 import pickle
@@ -9,16 +10,15 @@ words_found = []
 nombre_jugador = ''
 
 def contar_tiempo(start_time):
-  print('Entramos a contar el tiempo')
-  sleep(20)
+  sleep(90)
   global s
-  print(words_found)
   s.send(pickle.dumps(['juego_terminado', nombre_jugador ,words_found]))
+  print('\n Se acabo el tiempo! =D y econtraste ', words_found)
 
 def print_puzzle(sopa, width, height, word_bank):
 	for word in word_bank:
 		print word.center(width * 2)
-	print "=" * width * 2
+	print "=" * width * 3
 	for i in range(height):
 		print str(i+1) + '\t',
 		for j in range(width):
@@ -66,25 +66,29 @@ def juego(puzzle, word_coords, word_bank):
       time() - start_time)
   # Show the time elapsed
 
+direccion = raw_input('Que direccion? ')
+puerto = input('Que puerto? ')
+
+global nombre_jugador
+nombre_jugador = raw_input('Cual es tu nombre de jugador? ')
+
 s = socket.socket()
-s.connect(("localhost", 8000))
+s.connect((direccion, puerto))
 
 buffzise = 50000
 
-while(True):
-  if(raw_input('Quieres empezar a jugar? y/n ') == 'y'):
-    global nombre_jugador
-    nombre_jugador = raw_input('Cual es tu nombre de jugador?')
+recv = s.recv(buffzise)
+mensaje = pickle.loads(recv)
+
+if(mensaje[0] == 'negacion'):
+  print(mensaje[1])
+else:
+  while(True):
     s.send(pickle.dumps(['hola']))
     print('Esperando a los demás jugadores...')
     recv = s.recv(buffzise)
     mensaje = pickle.loads(recv)
     print mensaje[1]
     juego(mensaje[0], mensaje[1], mensaje[2])
-  else:
-    s.send(pickle.dumps(['adios']))
-    mensaje = s.recv(buffzise)
-    sopa = pickle.loads(mensaje)
-    print_puzzle(sopa,15,15)
 
-s.close()
+  s.close()
