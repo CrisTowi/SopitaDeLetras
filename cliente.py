@@ -10,10 +10,26 @@ words_found = []
 nombre_jugador = ''
 
 def contar_tiempo(start_time):
-  sleep(90)
+  mensaje = []
+  global buffzise
+  sleep(10)
   global s
   s.send(pickle.dumps(['juego_terminado', nombre_jugador ,words_found]))
   print('\n Se acabo el tiempo! =D y econtraste ', words_found)
+
+  bandera = True
+
+  while bandera:
+    recv = s.recv(buffzise)
+    mensaje = pickle.loads(recv)
+
+    print(mensaje)
+
+    bandera = False
+
+
+  print 'El ganador fue ' + mensaje[1][0][0] + ' con ' + str(len(mensaje[1][0][1])) + ' palabras encontradas'
+
 
 def print_puzzle(sopa, width, height, word_bank):
 	for word in word_bank:

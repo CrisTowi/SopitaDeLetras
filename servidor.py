@@ -12,7 +12,7 @@ import sys
 
 import pickle
 
-num_jugadores = 2
+num_jugadores = 1
 resultados_jugadores = []
 direccion = "127.0.0.1"
 puerto = 8000
@@ -58,12 +58,12 @@ def resultado_final(resultados_jugadores):
 	else:
 		print 'El ganador es ', ganador
 	for sock in lista_sockets:
-		sock.send(pickle.dumps(['ganador', ]))
+		sock.send(pickle.dumps(['ganador', ganador,  ]))
 
 
 
 def esperar_resultado():
-  sleep(95)
+  sleep(12)
   global resultados_jugadores
 
   resultado_final(resultados_jugadores)
@@ -73,7 +73,7 @@ def enviar_info(sc, address, sopa):
 
 	seguir =  True
 	while (seguir):
-		peticion = pickle.loads(sc.recv(50000))
+		peticion = pickle.loads(sc.recv(4096))
 
 		if ('hola'==peticion[0]):
 
